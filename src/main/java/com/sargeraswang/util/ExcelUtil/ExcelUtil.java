@@ -412,13 +412,21 @@ public class ExcelUtil {
                 if (row.getRowNum() == 0) {
                     if (clazz == Map.class) {
                         // 解析map用的key,就是excel标题行
+                        int cellNum = 0;
                         Iterator<Cell> cellIterator = row.cellIterator();
-                        Integer index = 0;
-                        while (cellIterator.hasNext()) {
-                            String value = cellIterator.next().getStringCellValue();
-                            titleMap.put(value, index);
-                            index++;
+                        while (cellIterator.hasNext()&&cellIterator.next().getCellTypeEnum().getCode()!=-1){
+                            cellNum++;
                         }
+                        final List<String> cellList = new ArrayList<>(cellNum);
+                        for (int i = 0; i < cellNum; i++) {
+                            final String s = row.getCell(i).toString();
+                            if (s.isEmpty()){
+                                continue;
+                            }
+                            titleMap.put(s, i);
+                        }
+                        titleMap.put("line num", Integer.MAX_VALUE);
+
                     }
                     continue;
                 }
@@ -451,6 +459,7 @@ public class ExcelUtil {
                             map.put(k, value);
                         }
                     }
+                    map.put("line num" ,row.getRowNum());
                     list.add((T) map);
 
                 } else {
